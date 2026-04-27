@@ -1,6 +1,6 @@
 public class Card {
-    private String rank;
-    private String suit;
+    private final String rank;
+    private final String suit;
 
     public Card(String rank, String suit) {
         this.rank = rank;
@@ -12,9 +12,13 @@ public class Card {
     }
 
     public int getValue() {
-        if (rank.equals("A")) return 11;
-        if (rank.equals("K") || rank.equals("Q") || rank.equals("J")) return 10;
-        return Integer.parseInt(rank);
+        switch (rank) {
+            case "A": return 11;
+            case "K":
+            case "Q":
+            case "J": return 10;
+            default: return Integer.parseInt(rank);
+        }
     }
 
     @Override

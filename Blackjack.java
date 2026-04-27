@@ -7,66 +7,147 @@ public class Blackjack {
         Scanner scanner = new Scanner(System.in);
         int money = STARTING_MONEY;
 
-        System.out.println("Welcome to Blackjack!");
+        System.out.println("=== BLACKJACK ===");
 
         while (money > 0) {
             System.out.println("\nMoney: $" + money);
-            System.out.print("Enter bet: ");
-            int bet = Integer.parseInt(scanner.nextLine());
+
+            // 🔹 BET
+            int bet;
+            while (true) {
+                System.out.print("Enter bet: ");
+                try {
+                    bet = Integer.parseInt(scanner.nextLine());
+                    if (bet > 0 && bet <= money) break;
+                } catch (Exception ignored) {}
+                System.out.println("Invalid bet.");
+            }
 
             Deck deck = new Deck();
-            Hand player = new Hand();
+
+            // 🔹 DEAL
+            List<Hand> playerHands = new ArrayList<>();
             Hand dealer = new Hand();
 
-            player.add(deck.draw());
+            Hand mainHand = new Hand();
+            mainHand.add(deck.draw());
+            mainHand.add(deck.draw());
+
             dealer.add(deck.draw());
-            player.add(deck.draw());
             dealer.add(deck.draw());
 
-            System.out.println("Dealer shows: " + dealer);
-            System.out.println("Your hand: " + player + " (" + player.getValue() + ")");
+            playerHands.add(mainHand);
 
-            // Player turn
-            while (player.getValue() < 21) {
-                System.out.print("Hit or Stand? (h/s): ");
-                String choice = scanner.nextLine();
+            System.out.println("Dealer shows: " + dealer.getFirstCard());
+            System.out.println("Your hand: " + mainHand);
 
-                if (choice.equalsIgnoreCase("h")) {
-                    player.add(deck.draw());
-                    System.out.println("Your hand: " + player + " (" + player.getValue() + ")");
-                } else {
-                    break;
+            // 🔹 INSURANCE
+            if (dealer.getFirstCard().getRank().equals("A")) {
+                System.out.print("Insurance? (y/n): ");
+                if (scanner.nextLine().equalsIgnoreCase("y")) {
+                    int insurance = bet / 2;
+                    money -= insurance;
+
+                    if (dealer.getValue() == 21) {
+                        System.out.println("Insurance wins!");
+                        money += insurance * 3;
+                    }
                 }
             }
 
-            if (player.getValue() > 21) {
-                System.out.println("Bust! You lose.");
-                money -= bet;
-                continue;
+            // 🔹 SPLIT CHECK
+            if (mainHand.getFirstCard().getRank().equals(mainHand.removeLast().getRank())
+                    && money >= bet) {
+
+                System.out.print("Split? (y/n): ");
+                if (scanner.nextLine().equalsIgnoreCase("y")) {
+
+                    Hand split = new Hand();
+                    split.add(mainHand.removeLast());
+
+                    mainHand.add(deck.draw());
+                    split.add(deck.draw());
+
+                    playerHands.add(split);
+                    money -= bet;
+
+                    System.out.println("Split into 2 hands.");
+                }
             }
 
-            // Dealer turn
-            while (dealer.getValue() < 17 || dealer.hasSoft17()) {
+            // 🔹 PLAYER TURN
+            for (int i = 0; i < playerHands.size(); i++) {
+                Hand h = playerHands.get(i);
+
+                System.out.println("\nHand " + (i + 1) + ": " + h);
+
+                boolean turn = true;
+                while (turn && h.getValue() < 21) {
+
+                    System.out.print("Hit, Stand, or Double? (h/s/d): ");
+                    String choice = scanner.nextLine();
+
+                    switch (choice.toLowerCase()) {
+
+                        case "h":
+                            h.add(deck.draw());
+                            System.out.println(h);
+                            break;
+
+                        case "s":
+                            turn = false;
+                            break;
+
+                        case "d":
+                            if (money >= bet) {
+                                money -= bet;
+                                bet *= 2;
+                                h.add(deck.draw());
+                                System.out.println("Double: " + h);
+                            }
+                            turn = false;
+                            break;
+                    }
+                }
+
+                if (h.getValue() > 21) {
+                    System.out.println("Bust!");
+                }
+            }
+
+            // 🔹 DEALER TURN
+            while (dealer.getValue() < 17 ||
+                  (dealer.getValue() == 17 && dealer.hasSoft17())) {
                 dealer.add(deck.draw());
             }
 
-            System.out.println("Dealer hand: " + dealer + " (" + dealer.getValue() + ")");
+            System.out.println("\nDealer: " + dealer + " = " + dealer.getValue());
 
-            // Results
-            if (dealer.getValue() > 21 || player.getValue() > dealer.getValue()) {
-                System.out.println("You win!");
-                money += bet;
-            } else if (player.getValue() < dealer.getValue()) {
-                System.out.println("You lose.");
-                money -= bet;
-            } else {
-                System.out.println("Push.");
+            // 🔹 RESULTS (3:2 BLACKJACK PAYOUT)
+            for (Hand h : playerHands) {
+                int pv = h.getValue();
+                int dv = dealer.getValue();
+
+                System.out.println("\nHand: " + h + " = " + pv);
+
+                if (pv > 21) {
+                    money -= bet;
+                } else if (dv > 21 || pv > dv) {
+                    System.out.println("Win!");
+                    money += (int)(bet * 1.5);
+                } else if (pv < dv) {
+                    System.out.println("Lose.");
+                    money -= bet;
+                } else {
+                    System.out.println("Push.");
+                }
             }
 
-            System.out.print("Play again? (y/n): ");
+            System.out.print("\nPlay again? (y/n): ");
             if (!scanner.nextLine().equalsIgnoreCase("y")) break;
         }
 
+        System.out.println("Game over.");
         scanner.close();
     }
 }

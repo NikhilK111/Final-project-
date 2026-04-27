@@ -7,6 +7,14 @@ public class Hand {
         cards.add(c);
     }
 
+    public Card removeLast() {
+        return cards.remove(cards.size() - 1);
+    }
+
+    public Card getFirstCard() {
+        return cards.get(0);
+    }
+
     public int getValue() {
         int sum = 0;
         int aces = 0;
@@ -33,7 +41,7 @@ public class Hand {
             if (c.getRank().equals("A")) aces++;
         }
 
-        return aces > 0 && sum == 17;
+        return sum == 17 && aces > 0;
     }
 
     @Override
