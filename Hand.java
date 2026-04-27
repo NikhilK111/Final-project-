@@ -44,8 +44,15 @@ public class Hand {
         return sum == 17 && aces > 0;
     }
 
-    @Override
-    public String toString() {
-        return cards.toString();
+    public Card getCard(int index) {
+        return cards.get(index);
+    }
+
+    public int size() {
+        return cards.size();
+    }
+
+    public boolean isBlackjack() {
+        return cards.size() == 2 && getValue() == 21;
     }
 }

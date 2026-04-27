@@ -25,8 +25,8 @@ public class Blackjack {
 
             Deck deck = new Deck();
 
-            // 🔹 DEAL
             List<Hand> playerHands = new ArrayList<>();
+            List<Integer> handBets = new ArrayList<>();
             Hand dealer = new Hand();
 
             Hand mainHand = new Hand();
@@ -37,6 +37,7 @@ public class Blackjack {
             dealer.add(deck.draw());
 
             playerHands.add(mainHand);
+            handBets.add(bet);
 
             System.out.println("Dealer shows: " + dealer.getFirstCard());
             System.out.println("Your hand: " + mainHand);
@@ -56,7 +57,7 @@ public class Blackjack {
             }
 
             // 🔹 SPLIT CHECK
-            if (mainHand.getFirstCard().getRank().equals(mainHand.removeLast().getRank())
+            if (mainHand.size() == 2 && mainHand.getCard(0).getRank().equals(mainHand.getCard(1).getRank())
                     && money >= bet) {
 
                 System.out.print("Split? (y/n): ");
@@ -69,6 +70,7 @@ public class Blackjack {
                     split.add(deck.draw());
 
                     playerHands.add(split);
+                    handBets.add(bet);
                     money -= bet;
 
                     System.out.println("Split into 2 hands.");
@@ -78,6 +80,7 @@ public class Blackjack {
             // 🔹 PLAYER TURN
             for (int i = 0; i < playerHands.size(); i++) {
                 Hand h = playerHands.get(i);
+                int currentBet = handBets.get(i);
 
                 System.out.println("\nHand " + (i + 1) + ": " + h);
 
@@ -99,11 +102,14 @@ public class Blackjack {
                             break;
 
                         case "d":
-                            if (money >= bet) {
-                                money -= bet;
-                                bet *= 2;
+                            if (money >= currentBet) {
+                                money -= currentBet;
+                                currentBet *= 2;
+                                handBets.set(i, currentBet);
                                 h.add(deck.draw());
                                 System.out.println("Double: " + h);
+                            } else {
+                                System.out.println("Not enough money.");
                             }
                             turn = false;
                             break;
@@ -124,20 +130,27 @@ public class Blackjack {
             System.out.println("\nDealer: " + dealer + " = " + dealer.getValue());
 
             // 🔹 RESULTS (3:2 BLACKJACK PAYOUT)
-            for (Hand h : playerHands) {
+            for (int i = 0; i < playerHands.size(); i++) {
+                Hand h = playerHands.get(i);
+                int handBet = handBets.get(i);
                 int pv = h.getValue();
                 int dv = dealer.getValue();
 
-                System.out.println("\nHand: " + h + " = " + pv);
+                System.out.println("\nHand " + (i + 1) + ": " + h + " = " + pv);
 
                 if (pv > 21) {
-                    money -= bet;
+                    System.out.println("Lose.");
+                    money -= handBet;
                 } else if (dv > 21 || pv > dv) {
                     System.out.println("Win!");
-                    money += (int)(bet * 1.5);
+                    if (h.isBlackjack()) {
+                        money += (int) (handBet * 1.5);
+                    } else {
+                        money += handBet;
+                    }
                 } else if (pv < dv) {
                     System.out.println("Lose.");
-                    money -= bet;
+                    money -= handBet;
                 } else {
                     System.out.println("Push.");
                 }
