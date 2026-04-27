@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class Blackjack {
-    private static final int STARTING_MONEY = 1000;
+    private static final int STARTING_MONEY = 5000;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
