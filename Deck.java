@@ -2,37 +2,47 @@ import java.util.*;
 
 public class Deck {
 
-    // List that holds all 52 cards in the deck
+    // This list stores all 52 cards in the deck
+    // ArrayList is used because it allows easy adding/removing cards
     private List<Card> cards = new ArrayList<>();
 
-    // Constructor: when a Deck is created, it automatically fills and shuffles
+    // Constructor: automatically builds a full deck when created
     public Deck() {
         reset();
     }
 
-    // Resets the deck back to a full 52 cards and shuffles them
+    // Resets the deck back to a full shuffled 52-card deck
     public void reset() {
-        cards.clear(); // remove any existing cards
 
-        // All possible ranks and suits in a standard deck
-        String[] ranks = {"2","3","4","5","6","7","8","9","10","J","Q","K","A"};
-        String[] suits = {"S","H","D","C"}; // Spades, Hearts, Diamonds, Clubs
+        // Clear any existing cards in the deck
+        cards.clear();
 
-        // Create every combination of rank and suit (52 cards)
+        // All possible card ranks in a standard deck
+        String[] ranks = {
+            "2","3","4","5","6","7","8","9","10","J","Q","K","A"
+        };
+
+        // All four suits in a deck
+        String[] suits = {
+            "♠","♥","♦","♣"
+        };
+
+        // Nested loop creates every combination of rank and suit
+        // This produces 52 total cards
         for (String r : ranks) {
             for (String s : suits) {
                 cards.add(new Card(r, s));
             }
         }
 
-        // Randomize the order of the cards
+        // Randomizes the order of the cards so the game is fair
         Collections.shuffle(cards);
     }
 
-    // Draws (removes) the top card from the deck
+    // Draws one card from the deck (like taking the top card)
     public Card draw() {
 
-        // If deck runs out of cards, automatically reset and reshuffle
+        // If the deck is empty, rebuild and reshuffle it
         if (cards.isEmpty()) reset();
 
         // Remove and return the last card in the list
