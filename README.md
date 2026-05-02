@@ -80,19 +80,18 @@ Flowchart Blackjack
              [End]
 
 War flowchart 
-
-[Start]
-   ↓
-[Shuffle deck]
-   ↓
-[Split cards 26/26]
-   ↓
-{Both players have cards?}
-   ↓Yes
-[Draw 1 card each]
-   ↓
-{Compare values}
-                ↓
+         [Start]
+               ↓
+        [Shuffle deck]
+               ↓
+        [Split cards 26/26]
+               ↓
+       {Both players have cards?}
+               ↓Yes
+        [Draw 1 card each]
+               ↓
+        {Compare values}
+               ↓
  
  ↓              ↓               ↓
 P1 wins      P2 wins        Tie (WAR)
